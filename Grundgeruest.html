@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Titel</title>
+</head>
+
+<body>
+	<canvas id="canvas2d" width="800" height="600" style="border:1px solid"></canvas>
+	<table>
+		<tr>
+			<td></td>
+			<td id="log"></td>
+		</tr>
+	</table>
+	<script>
+
+		const canvas = document.getElementById('canvas2d');
+		const context = canvas.getContext('2d');
+	
+		let circlePosX = canvas.width / 2;
+		let circlePosY = canvas.height / 2;
+	
+		function App() {
+	
+	
+			// Main Loop
+			setInterval(function () {
+	
+				circlePosY++;
+	
+				// Clear Canvas
+				context.clearRect(0, 0, canvas.width, canvas.height);
+	
+				// Circle
+				context.beginPath();
+				context.arc(circlePosX, circlePosY, 8, 0, 2 * Math.PI);
+				context.fill();
+	
+			}, 10);
+		}
+	
+		App();
+	
+	</script>
+</body>
+
+</html>
