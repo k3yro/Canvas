@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Titel</title>
+</head>
+
+<body>
+	<canvas id="canvas2d" width="800" height="600" style="border:1px solid"></canvas>
+	<table>
+		<tr>
+			<td>Sinus von X</td>
+			<td id="sinusX"></td>
+		</tr>
+	</table>
+	<script>
+		let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+		const canvas = document.getElementById('canvas2d');
+		const context = canvas.getContext('2d');
+        
+		class Sinus{
+
+			constructor()
+			{			
+				this.sinusX			= 0;     				
+				this.ruhelage 		= canvas.height / 2;
+				this.amplitude 		= 40;
+				this.T 				= 50;
+				this.frequenz		= 1/this.T;
+				this.kreisRadius 	= 10;
+				this.interval 		= 15;
+				this.inverse 		= -1; // only 1 or -1
+				this.richtung 		= -1; // only 1 or -1
+				this.posX 			= this.kreisRadius;
+				this.color			= 0;
+				this.font 			= '90px sans-serif';
+			}
+
+			refreshValues()
+			{
+				this.sinusX = this.inverse * this.amplitude * Math.sin(this.posX * this.frequenz);
+				this.posY = this.sinusX + this.ruhelage;
+				this.posX += this.richtung;
+			}
+
+			renderCircle()
+			{
+				this.refreshValues();
+				context.beginPath();
+				context.arc(this.posX, this.posY, this.kreisRadius, 0, 2 * Math.PI);
+				context.fill();
+			}
+
+			renderChar(char)
+			{
+				this.refreshValues();
+				context.font = this.font;
+				context.fillText(char, this.posX, this.posY);				
+			}
+		}
+
+		for (let i = 0; i < chars.length; i++) {
+			window["sinCharA" + i] = new Sinus;
+			window["sinCharA" + i].posX = canvas.width - window["sinCharA" + i].kreisRadius + i * 90;
+		}
+
+		for (let i = 0; i < chars.length; i++) {
+			window["sinCharB" + i] = new Sinus;
+			window["sinCharB" + i].ruhelage = canvas.height / 4;
+			window["sinCharB" + i].posX = canvas.width - window["sinCharB" + i].kreisRadius + i * 90;
+		}
+
+		for (let i = 0; i < chars.length; i++) {
+			window["sinCharC" + i] = new Sinus;
+			window["sinCharC" + i].ruhelage = canvas.height * 0.75;
+			window["sinCharC" + i].posX = canvas.width - window["sinCharC" + i].kreisRadius + i * 90;
+		}
+
+		for (let i = 0; i < chars.length; i++) {
+			window["sinCharD" + i] = new Sinus;
+			window["sinCharD" + i].ruhelage = canvas.height;
+			window["sinCharD" + i].posX = canvas.width - window["sinCharD" + i].kreisRadius + i * 90;
+		}
+
+		for (let i = 0; i < chars.length; i++) {
+			window["sinCharE" + i] = new Sinus;
+			window["sinCharE" + i].ruhelage = 0;
+			window["sinCharE" + i].posX = canvas.width - window["sinCharE" + i].kreisRadius + i * 90;
+		}
+
+		setInterval(function () {
+
+			context.clearRect(0, 0, canvas.width, canvas.height);
+
+			for (let i = 0; i < chars.length; i++) {
+				window["sinCharA" + i].renderChar(chars.charAt(i));
+			}
+
+			for (let i = 0; i < chars.length; i++) {
+				window["sinCharB" + i].renderChar(chars.charAt(i));
+			}
+
+			for (let i = 0; i < chars.length; i++) {
+				window["sinCharC" + i].renderChar(chars.charAt(i));
+			}
+
+			for (let i = 0; i < chars.length; i++) {
+				window["sinCharD" + i].renderChar(chars.charAt(i));
+			}
+
+			for (let i = 0; i < chars.length; i++) {
+				window["sinCharE" + i].renderChar(chars.charAt(i));
+			}
+
+		}, 10);
+
+	</script>
+</body>
+
+</html>
