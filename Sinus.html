@@ -16,31 +16,35 @@
 		</tr>
 	</table>
 	<script>
-		let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		let charWidth = 90;
-		//let chars = "ABC";
-
+		// config
+		let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";	// main string
+		let charWidth = 90;				// single char width
+		let charColor = "green";			// default char color
+		let randomColor = true;				// colorize
+		let stroboColor = true;				// crazy stuff
+		
+		// init
 		const canvas = document.getElementById('canvas2d');
 		const context = canvas.getContext('2d');
 
 		class Sinus {
 
 			constructor() {
-				this.sinusX				= 0;
-				this.ruhelage			= canvas.height / 2;
-				this.amplitude		= 40;
-				this.T						= 50;
-				this.frequenz 		= 1 / this.T;
+				this.sinusX 		= 0;			// left start
+				this.ruhelage 		= canvas.height / 2;	// default
+				this.amplitude 		= 40;
+				this.T 			= 50;
+				this.frequenz 		= 1 / this.T;		// do not change
 				this.kreisRadius 	= 10;
-				this.interval 		= 15;
-				this.inverse 			= -1;										// only 1 or -1
-				this.richtung 		= -1;										// only 1 or -1
-				this.posX 				= this.kreisRadius;
-				this.color 				= "";										// #ff0000 | red | ...
-				this.colorNotSet	= true;
-				this.colorRandom 	= true;								
-				this.stroboskop 	= true;								
-				this.font 				= "90px Consolas";
+				this.interval 		= 15;			
+				this.inverse 		= -1;			// only 1 or -1
+				this.richtung 		= -1;			// only 1 or -1
+				this.posX 		= this.kreisRadius;	// default start position
+				this.color 		= "";			// #ff0000 | red | ...
+				this.colorNotSet 	= true;			// Flag for colorRandom
+				this.colorRandom 	= true;			
+				this.stroboskop 	= true;			
+				this.font 		= "90px Consolas";
 			}
 
 			refreshValues() {
@@ -57,9 +61,9 @@
 						for (var i = 1; i <= 6; i++) {
 							this.color += hexValues[Math.ceil(Math.random() * 14)];
 						}
-						this.colorNotSet = false;						
+						this.colorNotSet = false;
 					}
-				}else if (this.color == "") {
+				} else if (this.color == "") {
 					this.color = "black";
 				}
 				context.fillStyle = this.color;
@@ -85,7 +89,9 @@
 				if (typeof window[name + i] === 'undefined') {
 					window[name + i] = new Sinus;
 				}
-				//window[name + i].color = "green";
+				window[name + i].color = charColor;
+				window[name + i].colorRandom = randomColor;
+				window[name + i].stroboskop = stroboColor;
 				window[name + i].ruhelage = yPosition;
 				window[name + i].posX = xVersatz + canvas.width - window[name + i].kreisRadius + i * charWidth;
 			}
