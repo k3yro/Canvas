@@ -6,16 +6,19 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Titel</title>
 	<style>
-		html, body {
+		* {
 			width:  100%;
 			height: 100%;
 			margin: 0;
+			padding: 0;
+			background-color: black;
+			overflow:hidden;
 		}
 	</style>
 </head>
 
 <body>
-	<canvas id="canvas2d" width="800" height="600" style="border:1px solid"></canvas>
+	<canvas id="canvas2d" width="800" height="600" ></canvas>
 
 	<script>
 		// config
@@ -167,6 +170,11 @@
 				renderItems("sinCharF");
 			}	
 		}, 20);
+
+		window.addEventListener('resize', function (e) { 
+			self.location.href=self.location.href;
+		});
+
 	</script>
 </body>
 
