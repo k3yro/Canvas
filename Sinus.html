@@ -62,58 +62,41 @@
 			}
 		}
 
-		for (let i = 0; i < chars.length; i++) {
-			window["sinCharA" + i] = new Sinus;
-			window["sinCharA" + i].posX = canvas.width - window["sinCharA" + i].kreisRadius + i * 90;
+		function initChars(name, xVersatz, yPosition)
+		{
+			for (let i = 0; i < chars.length; i++) {		
+				if(typeof window[name + i] === 'undefined')
+				{
+					window[name + i] = new Sinus;
+				}
+				window[name + i].ruhelage = yPosition;
+				window[name + i].posX = xVersatz + canvas.width - window[name + i].kreisRadius + i * 90;
+			}
 		}
 
-		for (let i = 0; i < chars.length; i++) {
-			window["sinCharB" + i] = new Sinus;
-			window["sinCharB" + i].ruhelage = canvas.height / 4;
-			window["sinCharB" + i].posX = canvas.width - window["sinCharB" + i].kreisRadius + i * 90;
+		function renderChars(name)
+		{
+			for (let i = 0; i < chars.length; i++) {
+				window[name + i].renderChar(chars.charAt(i));
+			}
 		}
 
-		for (let i = 0; i < chars.length; i++) {
-			window["sinCharC" + i] = new Sinus;
-			window["sinCharC" + i].ruhelage = canvas.height * 0.75;
-			window["sinCharC" + i].posX = canvas.width - window["sinCharC" + i].kreisRadius + i * 90;
-		}
-
-		for (let i = 0; i < chars.length; i++) {
-			window["sinCharD" + i] = new Sinus;
-			window["sinCharD" + i].ruhelage = canvas.height;
-			window["sinCharD" + i].posX = canvas.width - window["sinCharD" + i].kreisRadius + i * 90;
-		}
-
-		for (let i = 0; i < chars.length; i++) {
-			window["sinCharE" + i] = new Sinus;
-			window["sinCharE" + i].ruhelage = 0;
-			window["sinCharE" + i].posX = canvas.width - window["sinCharE" + i].kreisRadius + i * 90;
-		}
+		// ABCDE = 5 rows on canvas
+		initChars("sinCharA", 180, canvas.height / 2);
+		initChars("sinCharB", 90, canvas.height / 4);
+		initChars("sinCharC", 270, canvas.height * 0.75);
+		initChars("sinCharD", 360, canvas.height);
+		initChars("sinCharE", 0, 0);
 
 		setInterval(function () {
 
 			context.clearRect(0, 0, canvas.width, canvas.height);
 
-			for (let i = 0; i < chars.length; i++) {
-				window["sinCharA" + i].renderChar(chars.charAt(i));
-			}
-
-			for (let i = 0; i < chars.length; i++) {
-				window["sinCharB" + i].renderChar(chars.charAt(i));
-			}
-
-			for (let i = 0; i < chars.length; i++) {
-				window["sinCharC" + i].renderChar(chars.charAt(i));
-			}
-
-			for (let i = 0; i < chars.length; i++) {
-				window["sinCharD" + i].renderChar(chars.charAt(i));
-			}
-
-			for (let i = 0; i < chars.length; i++) {
-				window["sinCharE" + i].renderChar(chars.charAt(i));
-			}
+			renderChars("sinCharA");
+			renderChars("sinCharB");
+			renderChars("sinCharC");
+			renderChars("sinCharD");
+			renderChars("sinCharE");
 
 		}, 10);
 
