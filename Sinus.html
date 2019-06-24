@@ -17,86 +17,107 @@
 	</table>
 	<script>
 		let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		let charWidth = 90;
+		//let chars = "ABC";
 
 		const canvas = document.getElementById('canvas2d');
 		const context = canvas.getContext('2d');
-        
-		class Sinus{
 
-			constructor()
-			{			
-				this.sinusX			= 0;     				
-				this.ruhelage 		= canvas.height / 2;
-				this.amplitude 		= 40;
-				this.T 				= 50;
-				this.frequenz		= 1/this.T;
+		class Sinus {
+
+			constructor() {
+				this.sinusX				= 0;
+				this.ruhelage			= canvas.height / 2;
+				this.amplitude		= 40;
+				this.T						= 50;
+				this.frequenz 		= 1 / this.T;
 				this.kreisRadius 	= 10;
 				this.interval 		= 15;
-				this.inverse 		= -1; // only 1 or -1
-				this.richtung 		= -1; // only 1 or -1
-				this.posX 			= this.kreisRadius;
-				this.color			= 0;
-				this.font 			= '90px sans-serif';
+				this.inverse 			= -1;										// only 1 or -1
+				this.richtung 		= -1;										// only 1 or -1
+				this.posX 				= this.kreisRadius;
+				this.color 				= "";										// #ff0000 | red | ...
+				this.colorNotSet	= true;
+				this.colorRandom 	= true;								
+				this.stroboskop 	= true;								
+				this.font 				= "90px Consolas";
 			}
 
-			refreshValues()
-			{
+			refreshValues() {
 				this.sinusX = this.inverse * this.amplitude * Math.sin(this.posX * this.frequenz);
 				this.posY = this.sinusX + this.ruhelage;
 				this.posX += this.richtung;
 			}
 
-			renderCircle()
-			{
+			setColor() {
+				if (this.colorRandom) {
+					if (this.stroboskop || this.colorNotSet) {
+						var hexValues = "0123456789ABCDEF";
+						this.color = "#";
+						for (var i = 1; i <= 6; i++) {
+							this.color += hexValues[Math.ceil(Math.random() * 14)];
+						}
+						this.colorNotSet = false;						
+					}
+				}else if (this.color == "") {
+					this.color = "black";
+				}
+				context.fillStyle = this.color;
+			}
+
+			renderCircle() {
 				this.refreshValues();
 				context.beginPath();
 				context.arc(this.posX, this.posY, this.kreisRadius, 0, 2 * Math.PI);
 				context.fill();
 			}
 
-			renderChar(char)
-			{
+			renderChar(char) {
 				this.refreshValues();
+				this.setColor();
 				context.font = this.font;
-				context.fillText(char, this.posX, this.posY);				
+				context.fillText(char, this.posX, this.posY);
 			}
 		}
 
-		function initChars(name, xVersatz, yPosition)
-		{
-			for (let i = 0; i < chars.length; i++) {		
-				if(typeof window[name + i] === 'undefined')
-				{
+		function initChars(name, xVersatz, yPosition) {
+			for (let i = 0; i < chars.length; i++) {
+				if (typeof window[name + i] === 'undefined') {
 					window[name + i] = new Sinus;
 				}
+				//window[name + i].color = "green";
 				window[name + i].ruhelage = yPosition;
-				window[name + i].posX = xVersatz + canvas.width - window[name + i].kreisRadius + i * 90;
+				window[name + i].posX = xVersatz + canvas.width - window[name + i].kreisRadius + i * charWidth;
 			}
 		}
 
-		function renderChars(name)
-		{
+		function renderChars(name) {
 			for (let i = 0; i < chars.length; i++) {
+				if (window[name + i].posX < - charWidth) {
+					window[name + i].posX = window[name + (chars.length - 1)].posX + charWidth + i * charWidth;
+				}
 				window[name + i].renderChar(chars.charAt(i));
 			}
 		}
 
-		// ABCDE = 5 rows on canvas
-		initChars("sinCharA", 180, canvas.height / 2);
-		initChars("sinCharB", 90, canvas.height / 4);
-		initChars("sinCharC", 270, canvas.height * 0.75);
-		initChars("sinCharD", 360, canvas.height);
-		initChars("sinCharE", 0, 0);
+		// ABCDEF = 6 rows on canvas
+		initChars("sinCharA", 0 * charWidth, canvas.height * 1);
+		initChars("sinCharB", 1 * charWidth, canvas.height * 0.8);
+		initChars("sinCharC", 2 * charWidth, canvas.height * 0.6);
+		initChars("sinCharD", 3 * charWidth, canvas.height * 0.4);
+		initChars("sinCharE", 4 * charWidth, canvas.height * 0.2);
+		initChars("sinCharF", 5 * charWidth, canvas.height * 0);
 
 		setInterval(function () {
-
-			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.fillStyle = "white";
+			context.fillRect(0, 0, canvas.width, canvas.height);
 
 			renderChars("sinCharA");
 			renderChars("sinCharB");
 			renderChars("sinCharC");
 			renderChars("sinCharD");
 			renderChars("sinCharE");
+			renderChars("sinCharF");
 
 		}, 10);
 
