@@ -5,27 +5,33 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Titel</title>
+	<style>
+		html, body {
+			width:  100%;
+			height: 100%;
+			margin: 0;
+		}
+	</style>
 </head>
 
 <body>
 	<canvas id="canvas2d" width="800" height="600" style="border:1px solid"></canvas>
-	<table>
-		<tr>
-			<td>Sinus von X</td>
-			<td id="sinusX"></td>
-		</tr>
-	</table>
+
 	<script>
 		// config
 		let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";	// main string
 		let charWidth = 90;				// single char width
 		let charColor = "green";			// default char color
 		let randomColor = true;				// colorize
-		let stroboColor = true;				// crazy stuff
+		let stroboColor = true;				// epilepsy warning
+		let renderItem = "circle";			// char | circle
+		let singleLine = false;				// draws a single line
 		
 		// init
 		const canvas = document.getElementById('canvas2d');
 		const context = canvas.getContext('2d');
+		context.canvas.width  = window.innerWidth;
+		context.canvas.height = window.innerHeight;
 
 		class Sinus {
 
@@ -35,16 +41,19 @@
 				this.amplitude 		= 40;
 				this.T 			= 50;
 				this.frequenz 		= 1 / this.T;		// do not change
-				this.kreisRadius 	= 10;
+				this.kreisRadius 	= 1;
+				this.radiusNotSet	= true;
+				this.randSize		= true;			// random size
 				this.interval 		= 15;			
-				this.inverse 		= -1;			// only 1 or -1
+				this.inverse		= -1;			// only 1 or -1
 				this.richtung 		= -1;			// only 1 or -1
 				this.posX 		= this.kreisRadius;	// default start position
 				this.color 		= "";			// #ff0000 | red | ...
-				this.colorNotSet 	= true;			// Flag for colorRandom
+				this.colorNotSet 	= true;			// flag for colorRandom
 				this.colorRandom 	= true;			
-				this.stroboskop 	= true;			
-				this.font 		= "90px Consolas";
+				this.stroboskop 	= true;			// epilepsy warning
+				this.fontSize		  = 90;
+				this.fontFamily 	= "Consolas";
 			}
 
 			refreshValues() {
@@ -70,21 +79,36 @@
 			}
 
 			renderCircle() {
+        			this.inverse = -1;
 				this.refreshValues();
+        			this.inverse = 1;
+				this.setColor();
+        			let radius = this.kreisRadius * Math.random() * 2 + 0.7; 
+        			/*
+				if (this.randSize && this.radiusNotSet) {
+					this.kreisRadius *= Math.random() * 2 + 0.7;
+					this.radiusNotSet = false;
+				}
+        			*/
 				context.beginPath();
-				context.arc(this.posX, this.posY, this.kreisRadius, 0, 2 * Math.PI);
+				context.arc(this.posX, this.posY, radius, 0, 2 * Math.PI);
 				context.fill();
 			}
 
 			renderChar(char) {
 				this.refreshValues();
 				this.setColor();
-				context.font = this.font;
+				if (this.randSize && this.radiusNotSet) 
+				{
+					this.fontSize *= Math.random() * 1 + 0.5;
+					this.radiusNotSet = false;
+				}
+				context.font = this.fontSize + "px " + this.fontFamily;
 				context.fillText(char, this.posX, this.posY);
 			}
 		}
 
-		function initChars(name, xVersatz, yPosition) {
+		function initItems(name, xVersatz, yPosition) {
 			for (let i = 0; i < chars.length; i++) {
 				if (typeof window[name + i] === 'undefined') {
 					window[name + i] = new Sinus;
@@ -97,36 +121,52 @@
 			}
 		}
 
-		function renderChars(name) {
+		function renderItems(name) {
 			for (let i = 0; i < chars.length; i++) {
 				if (window[name + i].posX < - charWidth) {
 					window[name + i].posX = window[name + (chars.length - 1)].posX + charWidth + i * charWidth;
 				}
-				window[name + i].renderChar(chars.charAt(i));
+				switch (renderItem) {
+					case "char":
+					default:
+						window[name + i].renderChar(chars.charAt(i));
+						break;				
+					case "circle":
+						window[name + i].renderCircle();
+            window[name + i].renderChar(chars.charAt(i));
+						break;
+				}
 			}
 		}
 
-		// ABCDEF = 6 rows on canvas
-		initChars("sinCharA", 0 * charWidth, canvas.height * 1);
-		initChars("sinCharB", 1 * charWidth, canvas.height * 0.8);
-		initChars("sinCharC", 2 * charWidth, canvas.height * 0.6);
-		initChars("sinCharD", 3 * charWidth, canvas.height * 0.4);
-		initChars("sinCharE", 4 * charWidth, canvas.height * 0.2);
-		initChars("sinCharF", 5 * charWidth, canvas.height * 0);
+		if (singleLine || canvas.height < 500) {
+			initItems("sinChar", 0 * charWidth, canvas.height * 0.5);
+		}else{
+			// ABCDEF = 6 rows on canvas
+			initItems("sinCharA", 0 * charWidth, canvas.height * 1);
+			initItems("sinCharB", 1 * charWidth, canvas.height * 0.8);
+			initItems("sinCharC", 2 * charWidth, canvas.height * 0.6);
+			initItems("sinCharD", 3 * charWidth, canvas.height * 0.4);
+			initItems("sinCharE", 4 * charWidth, canvas.height * 0.2);
+			initItems("sinCharF", 5 * charWidth, canvas.height * 0);
+		}
+		
 
 		setInterval(function () {
-			context.fillStyle = "white";
+			context.fillStyle = "black";
 			context.fillRect(0, 0, canvas.width, canvas.height);
 
-			renderChars("sinCharA");
-			renderChars("sinCharB");
-			renderChars("sinCharC");
-			renderChars("sinCharD");
-			renderChars("sinCharE");
-			renderChars("sinCharF");
-
-		}, 10);
-
+			if (singleLine || canvas.height < 500) {
+				renderItems("sinChar");
+			}else{
+				renderItems("sinCharA");
+				renderItems("sinCharB");
+				renderItems("sinCharC");
+				renderItems("sinCharD");
+				renderItems("sinCharE");
+				renderItems("sinCharF");
+			}	
+		}, 20);
 	</script>
 </body>
 
