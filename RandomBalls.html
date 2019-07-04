@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Titel</title>
+</head>
+
+<body>
+	<canvas id="canvas2d" width="800" height="600" style="border:1px solid; float: left;"></canvas>
+	
+	<div style="width: 100px; float: left; padding-left: 20px">
+		<h2>Score:</h2>
+		<div id="score"></div>
+	</div>	
+
+	<script>
+
+		const canvas = document.getElementById('canvas2d');
+		const context = canvas.getContext('2d');
+	
+		let circlePosX = canvas.width / 2;
+		let circlePosY = canvas.height / 2;
+		
+		function App() {
+	
+			let second = Math.floor(Date.now() / 1000);
+			let balls = new Array();
+			let ballCounter = 0;
+			let fpsCounter = 0;
+			let fps = 60;
+
+			// Main Loop
+			let loop = setInterval(function () {
+				// Clear Canvas
+				context.clearRect(0, 0, canvas.width, canvas.height);
+
+				if (fps > 20) {
+					// New ball every second
+					var currSecond = Math.floor(Date.now() / 1000);
+					fpsCounter++;
+					if (second != currSecond) {
+						fps = fpsCounter;
+						console.log(fps);
+						fpsCounter = 0;
+						second = currSecond;
+						balls.push({
+							x: circlePosX,
+							y: circlePosY,
+							radius: Math.round(Math.random() * 20) + 3,
+							direction: Math.random(),
+							directionX: Math.round(Math.random()),
+							directionY: Math.round(Math.random()),
+							r: Math.round(Math.random() * 255),
+							g: Math.round(Math.random() * 255),
+							b: Math.round(Math.random() * 255),						
+						});
+					}
+				
+					// Move
+					for (let index = 0; index < balls.length; index++) {
+
+						if (balls[index].directionX) {
+							if (balls[index].x + balls[index].radius > canvas.width) {
+								balls[index].directionX = 0;
+							}
+							balls[index].x += Math.cos(balls[index].direction)
+						}else
+						{
+							if (balls[index].x - balls[index].radius < 0) {
+								balls[index].directionX = 1;
+							}
+							balls[index].x -= Math.cos(balls[index].direction)
+						}
+						if (balls[index].directionY) {
+							if (balls[index].y + balls[index].radius > canvas.height) {
+								balls[index].directionY = 0;
+							}
+							balls[index].y += Math.sin(balls[index].direction)
+						}else
+						{
+							if (balls[index].y - balls[index].radius < 0) {
+								balls[index].directionY = 1;
+							}
+							balls[index].y -= Math.sin(balls[index].direction)
+						}
+
+						context.fillStyle = "rgb(" + balls[index].r + "," + balls[index].g + "," + balls[index].b + ")";
+						context.beginPath();
+						context.arc(balls[index].x, balls[index].y, balls[index].radius, 0, 2 * Math.PI);
+						context.fill();
+					}
+				}
+				else
+				{
+					var allItemsDown = 1;
+					for (let index = 0; index < balls.length; index++) {
+						if (balls[index].y + balls[index].radius < canvas.height) {
+							balls[index].y += 1;
+							allItemsDown = 0;
+						}
+						
+						context.fillStyle = "rgb(" + balls[index].r + "," + balls[index].g + "," + balls[index].b + ")";
+						context.beginPath();
+						context.arc(balls[index].x, balls[index].y, balls[index].radius, 0, 2 * Math.PI);
+						context.fill();
+					}
+					if (allItemsDown) {
+						var score  = document.getElementById("score");
+						score.innerHTML = balls.length;
+						clearInterval(loop);
+					}	
+				}								
+			}, 10);		
+		}
+	
+		App();
+	
+	</script>
+</body>
+
+</html>
