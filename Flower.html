@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Titel</title>
+</head>
+
+<body>
+	<canvas id="canvas2d" width="800" height="600" ></canvas>
+	<table>
+		<tr>
+			<td></td>
+			<td id="log"></td>
+		</tr>
+	</table>
+	<script>
+
+		const canvas = document.getElementById('canvas2d');
+		const context = canvas.getContext('2d');
+	
+		let circlePosX = canvas.width / 2;
+		let circlePosY = canvas.height / 2;
+	
+		function App() {
+
+			// create circle objects
+			let circleObjects = new Array();
+			for (let index = 0; index < 8; index++) {
+				circleObjects.push({
+					x: circlePosX,
+					y: circlePosY,
+					direction: 0
+				});
+				
+			}
+
+			// array for color change			
+			let colorCount = 0;
+			let colors = new Array();
+			colors[0] = "#f00";
+			colors[1] = "#0ff";
+			colors[2] = "#ff0";
+			colors[3] = "#0f0";
+			context.fillStyle = colors[3];
+
+			function renderObj(cObj, index)
+			{		
+				// leave position	
+				switch (index) {
+					case 0:
+						cObj.x += Math.cos(cObj.direction * Math.PI / 180);
+						cObj.y += Math.sin(cObj.direction * Math.PI / 180);
+						break;
+					case 1:
+						cObj.x += Math.sin(cObj.direction * Math.PI / 180);
+						cObj.y += Math.cos(cObj.direction * Math.PI / 180);
+						break;
+					case 2:
+						cObj.x -= Math.cos(cObj.direction * Math.PI / 180);
+						cObj.y -= Math.sin(cObj.direction * Math.PI / 180);
+						break;
+					case 3:
+						cObj.x -= Math.sin(cObj.direction * Math.PI / 180);
+						cObj.y -= Math.cos(cObj.direction * Math.PI / 180);
+						break;
+					case 4:
+						cObj.x += Math.cos(cObj.direction * Math.PI / 180);
+						cObj.y -= Math.sin(cObj.direction * Math.PI / 180);
+						break;
+					case 5:
+						cObj.x -= Math.sin(cObj.direction * Math.PI / 180);
+						cObj.y += Math.cos(cObj.direction * Math.PI / 180);
+						break;
+					case 6:
+						cObj.x += Math.sin(cObj.direction * Math.PI / 180);
+						cObj.y -= Math.cos(cObj.direction * Math.PI / 180);
+						break;
+					case 7:
+						cObj.x -= Math.cos(cObj.direction * Math.PI / 180);
+						cObj.y += Math.sin(cObj.direction * Math.PI / 180);
+						break;
+					default:
+						return;
+				}
+
+				// change color
+				cObj.direction += 0.8;
+				if (cObj.direction > 360 && index == 0) {
+					cObj.direction = 0;
+					context.fillStyle= colors[colorCount];
+					console.log(colors[colorCount]);
+					colorCount == 3 ? colorCount = 0 : colorCount++;
+				}
+
+				// render leaves
+				context.beginPath();
+				context.arc(cObj.x, cObj.y, 130, 0, 2 * Math.PI);
+				context.fill();
+			}
+
+			// Main Loop
+			setInterval(function () {
+
+				// Clear Canvas
+				context.clearRect(0, 0, canvas.width, canvas.height);
+
+				// render circles in object
+				for (let index = 0; index < circleObjects.length; index++) {
+					renderObj(circleObjects[index], index);	
+				}
+
+			}, 10);
+		}
+	
+		App();
+	
+	</script>
+</body>
+
+</html>
