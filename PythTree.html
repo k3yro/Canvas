@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Titel</title>
+</head>
+
+<body>
+	<canvas id="canvas2d" width="800" height="600" style="border:1px solid"></canvas>
+	<table>
+		<tr>
+			<td></td>
+			<td id="log"></td>
+		</tr>
+	</table>
+	<script>
+
+		const canvas = document.getElementById('canvas2d');
+		const context = canvas.getContext('2d');
+	
+		let circlePosX = canvas.width / 2;
+		let circlePosY = canvas.height / 2;
+	
+		class Pen {
+			constructor(posX, posY) 
+			{
+				this.direction = 0;
+				this.incValueX = Math.cos(this.direction * Math.PI / 180);
+				this.incValueY = Math.sin(this.direction * Math.PI / 180);
+				this.posX = posX;
+				this.posY = posY;
+				context.beginPath();
+				context.moveTo(this.posX, this.posY);
+
+			};
+
+			move(s, draw)
+			{
+				for (let index = 0; index < s; index++) {
+					this.posX += this.incValueX;
+					this.posY += this.incValueY;
+				}
+				if (draw) {
+					context.lineTo(this.posX , this.posY);
+					context.stroke(); 
+				}else{
+					context.moveTo(this.posX , this.posY);
+				}
+			};
+
+			right(d)
+			{
+				this.direction += d;
+				this.incValueX = Math.cos(this.direction * Math.PI / 180);
+				this.incValueY = Math.sin(this.direction * Math.PI / 180);
+			};
+
+			left(d)
+			{
+				this.direction -= d;
+				this.incValueX = Math.cos(this.direction * Math.PI / 180);
+				this.incValueY = Math.sin(this.direction * Math.PI / 180);
+			};
+		};
+
+		let pen = new Pen(canvas.width/2 - 50, 400);
+
+		function drawSquare(s)
+		{		
+			for (let index = 0; index < 4; index++) {
+				pen.move(s, true);
+				pen.left(90);
+			}
+
+		}
+
+		function drawSquareRight(s)
+		{		
+			for (let index = 0; index < 4; index++) {
+				pen.move(s, true);
+				pen.right(90);
+			}
+
+		}
+		
+		function drawRecursive(s, recCount)
+		{
+			recCount--;
+			if (recCount <= 0) {
+				return;
+			}
+			let x = pen.posX;
+			let y = pen.posY;
+			let d = pen.direction;
+			drawSquare(s);
+			pen.left(90);
+			pen.move(s, false);
+			pen.right(45);			
+			drawRecursive(Math.round(0.5 * s * Math.sqrt(2)), recCount);
+			pen.posX = x;
+			pen.posY = y;
+			pen.direction = d;
+			pen.incValueX = Math.cos(pen.direction * Math.PI / 180);
+			pen.incValueY = Math.sin(pen.direction * Math.PI / 180);
+			pen.move(s, false);
+			pen.left(90);
+			pen.move(s, false);
+			pen.left(45);
+			drawSquareRight(Math.round(0.5 * s * Math.sqrt(2)));
+			pen.right(90);
+			pen.move(Math.round(0.5 * s * Math.sqrt(2)), false);
+			pen.left(45);
+			drawSquareRight(Math.round(0.5 * s));
+			pen.move(Math.round(0.5 * s), false);
+			pen.left(90);
+			drawSquareRight(Math.round(0.5 * s));
+		}
+
+		drawRecursive(100, 11);
+
+	</script>
+</body>
+
+</html>
