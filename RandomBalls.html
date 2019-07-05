@@ -51,22 +51,25 @@
 				if (fps > 20 || runtime < 10) {
 
 					// New ball every frame
+					var direction = Math.round((Math.random() * 360) + 1);
+					console.log(direction);
 					balls.push({
-							x: circlePosX,
-							y: circlePosY,
-							radius: Math.round(Math.random() * 20) + 3,
-							direction: Math.random(),
-							directionX: Math.round(Math.random()),
-							directionY: Math.round(Math.random()),
-							r: Math.round(Math.random() * 255),
-							g: Math.round(Math.random() * 255),
-							b: Math.round(Math.random() * 255),						
-						});
+						x: circlePosX,
+						y: circlePosY,
+						radius: Math.round(Math.random() * 20) + 3,
+						direction: direction,
+						moveX: Math.cos(direction * Math.PI / 180),
+						moveY: Math.sin(direction * Math.PI / 180),
+						r: Math.round(Math.random() * 255),
+						g: Math.round(Math.random() * 255),
+						b: Math.round(Math.random() * 255),						
+					});
 					
 					// Calculate FPS
 					var currSecond = Math.floor(Date.now() / 1000);
 					fpsCounter++;
 					if (second != currSecond) {
+						
 						fps = fpsCounter;
 						htmlFps.innerHTML = fps;
 						fpsCounter = 0;
@@ -78,30 +81,17 @@
 					// Move and side reflection balls
 					for (let index = 0; index < balls.length; index++) {
 
-						if (balls[index].directionX) {
-							if (balls[index].x + balls[index].radius > canvas.width) {
-								balls[index].directionX = 0;
-							}
-							balls[index].x += Math.cos(balls[index].direction)
-						}else
-						{
-							if (balls[index].x - balls[index].radius < 0) {
-								balls[index].directionX = 1;
-							}
-							balls[index].x -= Math.cos(balls[index].direction)
+						// Edge reflection
+						if (balls[index].x + balls[index].radius > canvas.width || balls[index].x - balls[index].radius < 0) {
+							balls[index].moveX *= -1;
 						}
-						if (balls[index].directionY) {
-							if (balls[index].y + balls[index].radius > canvas.height) {
-								balls[index].directionY = 0;
-							}
-							balls[index].y += Math.sin(balls[index].direction)
-						}else
-						{
-							if (balls[index].y - balls[index].radius < 0) {
-								balls[index].directionY = 1;
-							}
-							balls[index].y -= Math.sin(balls[index].direction)
+						if (balls[index].y + balls[index].radius > canvas.height || balls[index].y - balls[index].radius < 0) {
+							balls[index].moveY *= -1;
 						}
+
+						// Move ball
+						balls[index].x += balls[index].moveX;
+						balls[index].y += balls[index].moveY;
 
 						// Render balls
 						context.fillStyle = "rgb(" + balls[index].r + "," + balls[index].g + "," + balls[index].b + ")";
@@ -130,7 +120,7 @@
 						clearInterval(loop); // end of loop
 					}	
 				}								
-			}, 10);		
+			}, 16);		
 		}
 	
 		App();
