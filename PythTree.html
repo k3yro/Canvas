@@ -22,103 +22,48 @@
 	
 		let circlePosX = canvas.width / 2;
 		let circlePosY = canvas.height / 2;
+
+		let tanphi = Math.tan(40 * Math.PI/180);
 	
-		class Pen {
-			constructor(posX, posY) 
-			{
-				this.direction = 0;
-				this.incValueX = Math.cos(this.direction * Math.PI / 180);
-				this.incValueY = Math.sin(this.direction * Math.PI / 180);
-				this.posX = posX;
-				this.posY = posY;
-				context.beginPath();
-				context.moveTo(this.posX, this.posY);
-
-			};
-
-			move(s, draw)
-			{
-				for (let index = 0; index < s; index++) {
-					this.posX += this.incValueX;
-					this.posY += this.incValueY;
-				}
-				if (draw) {
-					context.lineTo(this.posX , this.posY);
-					context.stroke(); 
-				}else{
-					context.moveTo(this.posX , this.posY);
-				}
-			};
-
-			right(d)
-			{
-				this.direction += d;
-				this.incValueX = Math.cos(this.direction * Math.PI / 180);
-				this.incValueY = Math.sin(this.direction * Math.PI / 180);
-			};
-
-			left(d)
-			{
-				this.direction -= d;
-				this.incValueX = Math.cos(this.direction * Math.PI / 180);
-				this.incValueY = Math.sin(this.direction * Math.PI / 180);
-			};
-		};
-
-		let pen = new Pen(canvas.width/2 - 50, 500);
-
-		function drawSquare(s)
-		{		
-			for (let index = 0; index < 4; index++) {
-				pen.move(s, true);
-				pen.left(90);
-			}
-
-		}
-
-		function drawSquareRight(s)
-		{		
-			for (let index = 0; index < 4; index++) {
-				pen.move(s, true);
-				pen.right(90);
-			}
-
-		}
-		
-		function drawRecursive(s, recCount)
+		function paintTree(x1, y1, x2, y2, level)
 		{
-			recCount--;
-			if (recCount <= 0) {
+			if (level <= 0) {
 				return;
 			}
-			let x = pen.posX;
-			let y = pen.posY;
-			let d = pen.direction;
-			drawSquare(s);
-			pen.left(90);
-			pen.move(s, false);
-			pen.right(45);			
-			drawRecursive(Math.round(0.5 * s * Math.sqrt(2)), recCount);
-			pen.posX = x;
-			pen.posY = y;
-			pen.direction = d;
-			pen.incValueX = Math.cos(pen.direction * Math.PI / 180);
-			pen.incValueY = Math.sin(pen.direction * Math.PI / 180);
-			pen.move(s, false);
-			pen.left(90);
-			pen.move(s, false);
-			pen.left(45);
-			drawSquareRight(Math.round(0.5 * s * Math.sqrt(2)));
-			pen.right(90);
-			pen.move(Math.round(0.5 * s * Math.sqrt(2)), false);
-			pen.left(45);
-			drawSquareRight(Math.round(0.5 * s));
-			pen.move(Math.round(0.5 * s), false);
-			pen.left(90);
-			drawSquareRight(Math.round(0.5 * s));
+			level--;
+
+			let dx = x2 - x1;
+			let dy = y1 - y2;
+			let x3 = x1 - dy;
+			let y3 = y1 - dx;
+			let x4 = x2 - dy;
+			let y4 = y2 - dx;
+
+			context.beginPath();
+			context.moveTo(x1, y1);
+			context.lineTo(x2, y2);
+			context.stroke(); 
+
+			context.lineTo(x4, y4);
+			context.stroke(); 
+
+			context.lineTo(x3, y3);
+			context.stroke(); 
+
+			context.moveTo(x1, y1);
+			context.lineTo(x3, y3);
+			context.stroke(); 
+			
+			let v = ((x3 + x4) / 2 - (dy/2 * tanphi));
+			let w = ((y3 + y4) / 2 - (dx/2 * tanphi));
+
+			if((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) > 2) {
+				paintTree(x3,y3,v,w, level);
+				paintTree(v,w,x4,y4, level);
+			}
 		}
 
-		drawRecursive(140, 11);
+		paintTree(350, 500, 450, 500, 10);
 
 	</script>
 </body>
