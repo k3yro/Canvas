@@ -8,11 +8,17 @@
 </head>
 
 <body>
-	<canvas id="canvas2d" width="800" height="600" style="border:1px solid; float: left;"></canvas>
+	<canvas id="canvas2d" width="800" height="600"></canvas>
 	
 	<div style="width: 100px; float: left; padding-left: 20px">
-		<h2>Score:</h2>
-		<div id="score"></div>
+		<dl>
+			<dt>FPS:</dt>
+			<dd id="fps"></dd>
+			<dt>Time:</dt>
+			<dd id="seconds"></dd>
+			<dt>Score:</dt>
+			<dd id="score"></dd>
+		</dl>
 	</div>	
 
 	<script>
@@ -22,6 +28,10 @@
 	
 		let circlePosX = canvas.width / 2;
 		let circlePosY = canvas.height / 2;
+
+		var htmlFps  = document.getElementById("fps");
+		var htmlScore  = document.getElementById("score");
+		var htmlSeconds  = document.getElementById("seconds");
 		
 		function App() {
 	
@@ -30,22 +40,18 @@
 			let ballCounter = 0;
 			let fpsCounter = 0;
 			let fps = 60;
+			let runtime = 0;
 
 			// Main Loop
 			let loop = setInterval(function () {
+
 				// Clear Canvas
 				context.clearRect(0, 0, canvas.width, canvas.height);
 
-				if (fps > 20) {
-					// New ball every second
-					var currSecond = Math.floor(Date.now() / 1000);
-					fpsCounter++;
-					if (second != currSecond) {
-						fps = fpsCounter;
-						console.log(fps);
-						fpsCounter = 0;
-						second = currSecond;
-						balls.push({
+				if (fps > 20 || runtime < 10) {
+
+					// New ball every frame
+					balls.push({
 							x: circlePosX,
 							y: circlePosY,
 							radius: Math.round(Math.random() * 20) + 3,
@@ -56,9 +62,20 @@
 							g: Math.round(Math.random() * 255),
 							b: Math.round(Math.random() * 255),						
 						});
+					
+					// Calculate FPS
+					var currSecond = Math.floor(Date.now() / 1000);
+					fpsCounter++;
+					if (second != currSecond) {
+						fps = fpsCounter;
+						htmlFps.innerHTML = fps;
+						fpsCounter = 0;
+						second = currSecond;
+						runtime++;
+						htmlSeconds.innerHTML = runtime;
 					}
 				
-					// Move
+					// Move and side reflection balls
 					for (let index = 0; index < balls.length; index++) {
 
 						if (balls[index].directionX) {
@@ -86,6 +103,7 @@
 							balls[index].y -= Math.sin(balls[index].direction)
 						}
 
+						// Render balls
 						context.fillStyle = "rgb(" + balls[index].r + "," + balls[index].g + "," + balls[index].b + ")";
 						context.beginPath();
 						context.arc(balls[index].x, balls[index].y, balls[index].radius, 0, 2 * Math.PI);
@@ -94,6 +112,7 @@
 				}
 				else
 				{
+					// Fps under 20, all balls fall down
 					var allItemsDown = 1;
 					for (let index = 0; index < balls.length; index++) {
 						if (balls[index].y + balls[index].radius < canvas.height) {
@@ -107,9 +126,8 @@
 						context.fill();
 					}
 					if (allItemsDown) {
-						var score  = document.getElementById("score");
-						score.innerHTML = balls.length;
-						clearInterval(loop);
+						htmlScore.innerHTML = balls.length;
+						clearInterval(loop); // end of loop
 					}	
 				}								
 			}, 10);		
