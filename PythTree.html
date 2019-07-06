@@ -5,10 +5,30 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Titel</title>
+	<style>
+		*{
+			font-family: monospace;
+		}
+		#canvas2d{
+			float:left;
+			width: 800px;
+		}
+		#config{
+			float: left;
+			padding-left:20px;
+			width: 200px;
+		}
+	</style>
 </head>
 
 <body>
 	<canvas id="canvas2d" width="800" height="600" style="border:1px solid"></canvas>
+	<div id="config">
+		<h2>Einstellungen</h2>
+		<label for="level">Recursionslevel</label><br>
+		<input type="range" id="level" value="1" min="1" max="11" />
+		<span id="level_value"></span>
+	</div>
 	<table>
 		<tr>
 			<td></td>
@@ -23,13 +43,16 @@
 		let circlePosX = canvas.width / 2;
 		let circlePosY = canvas.height / 2;
 
+		let htmlLevel = document.querySelector("#level");
+		let htmlLeVal = document.querySelector("#level_value");
+
+		// Configure
 		let tanphi = Math.tan(40 * Math.PI/180);
+		let level = 5;
 	
 		function paintTree(x1, y1, x2, y2, level)
 		{
-			if (level <= 0) {
-				return;
-			}
+			if (level <= 0) return;
 			level--;
 
 			let dx = x2 - x1;
@@ -42,14 +65,8 @@
 			context.beginPath();
 			context.moveTo(x1, y1);
 			context.lineTo(x2, y2);
-			context.stroke(); 
-
 			context.lineTo(x4, y4);
-			context.stroke(); 
-
-			context.lineTo(x3, y3);
-			context.stroke(); 
-
+			context.lineTo(x3, y3);	
 			context.moveTo(x1, y1);
 			context.lineTo(x3, y3);
 			context.stroke(); 
@@ -63,7 +80,21 @@
 			}
 		}
 
-		paintTree(350, 500, 450, 500, 10);
+		paintTree(350, 500, 450, 500, level);
+		htmlLevel.value = level;
+		htmlLeVal.innerHTML = level;
+
+		window.addEventListener("load", function(){
+
+			htmlLevel.addEventListener("change", function(){
+				level = this.value;
+				htmlLeVal.innerHTML = level;		
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				paintTree(350, 500, 450, 500, level);
+
+			});
+		});
+
 
 	</script>
 </body>
