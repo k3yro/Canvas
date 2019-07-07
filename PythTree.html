@@ -37,6 +37,8 @@
 		<label for="winkel">Winkel</label><br>
 		<input type="range" id="winkel" value="40" min="0" max="45" />
 		<span id="winkel_value"></span>
+		<br /><br />
+		<input type="button" id="rWinkel" value="Zufällige Winkel" />
 	</div>
 	<div id="log">
 		<table>
@@ -58,17 +60,19 @@
 		let htmlLeVal = document.querySelector("#level_value");
 		let htmlWinkel = document.querySelector("#winkel");
 		let htmlWinVal = document.querySelector("#winkel_value");
+		let htmlRWinkel = document.querySelector("#rWinkel");
 
 		// Configure
 		let winkel = 45;
+		let rWinkel = 0;
 		let tanphi = Math.tan(winkel * Math.PI/180);
 		let level = 11;
 		let colorSet = 0;
 	
 		function paintTree(x1, y1, x2, y2, lvl)
 		{
-			if (lvl <= 0) return;
-			lvl--;
+			if (lvl <= 0) return; lvl--;
+			if (rWinkel) tanphi = Math.tan(Math.round(Math.random() * 25 + 25) * Math.PI/180);
 
 			let dx = x2 - x1;
 			let dy = y1 - y2;
@@ -120,6 +124,13 @@
 				htmlWinVal.innerHTML = winkel;		
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				paintTree(350, 500, 450, 500, level);
+			});
+
+			htmlRWinkel.addEventListener("click", function(){
+				rWinkel = 1;
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				paintTree(350, 500, 450, 500, level);
+				rWinkel = 0;
 			});
 		});
 
