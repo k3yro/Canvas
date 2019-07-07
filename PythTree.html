@@ -18,6 +18,10 @@
 			padding-left:20px;
 			width: 200px;
 		}
+		#log{
+			clear: both;
+		}
+
 	</style>
 </head>
 
@@ -25,16 +29,23 @@
 	<canvas id="canvas2d" width="800" height="600" style="border:1px solid"></canvas>
 	<div id="config">
 		<h2>Einstellungen</h2>
+
 		<label for="level">Recursionslevel</label><br>
 		<input type="range" id="level" value="1" min="1" max="11" />
 		<span id="level_value"></span>
+
+		<label for="winkel">Winkel</label><br>
+		<input type="range" id="winkel" value="40" min="0" max="45" />
+		<span id="winkel_value"></span>
 	</div>
-	<table>
-		<tr>
-			<td></td>
-			<td id="log"></td>
-		</tr>
-	</table>
+	<div id="log">
+		<table>
+			<tr>
+				<td></td>
+				<td id="test"></td>
+			</tr>
+		</table>
+	</div>
 	<script>
 
 		const canvas = document.getElementById('canvas2d');
@@ -45,15 +56,19 @@
 
 		let htmlLevel = document.querySelector("#level");
 		let htmlLeVal = document.querySelector("#level_value");
+		let htmlWinkel = document.querySelector("#winkel");
+		let htmlWinVal = document.querySelector("#winkel_value");
 
 		// Configure
-		let tanphi = Math.tan(40 * Math.PI/180);
-		let level = 5;
+		let winkel = 45;
+		let tanphi = Math.tan(winkel * Math.PI/180);
+		let level = 11;
+		let colorSet = 0;
 	
-		function paintTree(x1, y1, x2, y2, level)
+		function paintTree(x1, y1, x2, y2, lvl)
 		{
-			if (level <= 0) return;
-			level--;
+			if (lvl <= 0) return;
+			lvl--;
 
 			let dx = x2 - x1;
 			let dy = y1 - y2;
@@ -62,6 +77,9 @@
 			let x4 = x2 - dy;
 			let y4 = y2 - dx;
 
+			//context.globalCompositeOperation = "darken";
+
+			context.fillStyle = getColorFromLevel(lvl);
 			context.beginPath();
 			context.moveTo(x1, y1);
 			context.lineTo(x2, y2);
@@ -69,32 +87,71 @@
 			context.lineTo(x3, y3);	
 			context.moveTo(x1, y1);
 			context.lineTo(x3, y3);
-			context.stroke(); 
+			context.closePath();
+			context.fill();
 			
 			let v = ((x3 + x4) / 2 - (dy/2 * tanphi));
 			let w = ((y3 + y4) / 2 - (dx/2 * tanphi));
 
 			if((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) > 2) {
-				paintTree(x3,y3,v,w, level);
-				paintTree(v,w,x4,y4, level);
+				paintTree(x3,y3,v,w, lvl);
+				paintTree(v,w,x4,y4, lvl);
 			}
 		}
 
 		paintTree(350, 500, 450, 500, level);
 		htmlLevel.value = level;
 		htmlLeVal.innerHTML = level;
+		htmlWinkel.value = winkel;
+		htmlWinVal.innerHTML = winkel;
 
 		window.addEventListener("load", function(){
 
 			htmlLevel.addEventListener("change", function(){
 				level = this.value;
-				htmlLeVal.innerHTML = level;		
+				htmlLeVal.innerHTML = level;	
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				paintTree(350, 500, 450, 500, level);
+			});
 
+			htmlWinkel.addEventListener("change", function(){
+				winkel = this.value;
+				tanphi = Math.tan(winkel * Math.PI/180);
+				htmlWinVal.innerHTML = winkel;		
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				paintTree(350, 500, 450, 500, level);
 			});
 		});
 
+		function getColorFromLevel(lvl)
+		{
+			switch (lvl) {
+				case 0:
+					return colorSet ? "#3b9d66" : "#0000ff";
+				case 1:
+					return colorSet ? "#4ea766" : "#002bff";
+				case 2:
+					return colorSet ? "#62b166" : "#005aff";
+				case 3:
+					return colorSet ? "#76ba66" : "#008fff";
+				case 4:
+					return colorSet ? "#89c466" : "#00bbff";
+				case 5:
+					return colorSet ? "#9dce66" : "#00ebff";	
+				case 6:
+					return colorSet ? "#b1d866" : "#00ffa3";
+				case 7:
+					return colorSet ? "#c4e266" : "#05ff00";
+				case 8:
+					return colorSet ? "#d8eb66" : "#ddff00";
+				case 9:
+					return colorSet ? "#ebf566" : "#ffb000";	
+				case 10:
+					return colorSet ? "#ffff66" : "#ff0000";		
+				default:
+					return "black";
+			}	
+		}
 
 	</script>
 </body>
