@@ -136,6 +136,8 @@
 
 		function getColorFromLevel(lvl)
 		{
+			var offset = 11 - level;
+			lvl = lvl + offset;
 			switch (lvl) {
 				case 0:
 					return colorSet ? "#3b9d66" : "#0000ff";
