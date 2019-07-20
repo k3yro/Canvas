@@ -35,7 +35,7 @@
 		<span id="level_value"></span>
 
 		<label for="winkel">Winkel</label><br>
-		<input type="range" id="winkel" value="40" min="0" max="45" />
+		<input type="range" id="winkel" value="30" min="0" max="90" />
 		<span id="winkel_value"></span>
 		<br /><br />
 		<input type="button" id="rWinkel" value="Zufällige Winkel" />
@@ -64,24 +64,22 @@
 
 		// Configure
 		let winkel = 45;
-		let rWinkel = 0;
-		let tanphi = Math.tan(winkel * Math.PI/180);
-		let level = 11;
+		//let rWinkel = 0;
+		let level = 8;
 		let colorSet = 0;
-	
-		function paintTree(x1, y1, x2, y2, lvl)
+		let initLength = 100;
+
+		function paintTree(x1, y1, x2, y2, lvl, c, wnk)
 		{
 			if (lvl <= 0) return; lvl--;
-			if (rWinkel) tanphi = Math.tan(Math.round(Math.random() * 25 + 25) * Math.PI/180);
-
+			//if (rWinkel) tanphi = Math.tan(Math.round(Math.random() * 25 + 25) * Math.PI/180);
+			
 			let dx = x2 - x1;
 			let dy = y1 - y2;
 			let x3 = x1 - dy;
 			let y3 = y1 - dx;
 			let x4 = x2 - dy;
 			let y4 = y2 - dx;
-
-			//context.globalCompositeOperation = "darken";
 
 			context.fillStyle = getColorFromLevel(lvl);
 			context.beginPath();
@@ -93,17 +91,23 @@
 			context.lineTo(x3, y3);
 			context.closePath();
 			context.fill();
-			
-			let v = ((x3 + x4) / 2 - (dy/2 * tanphi));
-			let w = ((y3 + y4) / 2 - (dx/2 * tanphi));
 
-			if((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) > 2) {
-				paintTree(x3,y3,v,w, lvl);
-				paintTree(v,w,x4,y4, lvl);
-			}
+			let alpha = winkel * -1;
+			let gamma = -90;
+			let beta = (180 + alpha + gamma)*-1;
+
+			let b = (c * Math.sin((Math.PI / 180) * alpha)) / Math.sin((Math.PI / 180) * gamma);
+			c = (c * Math.sin((Math.PI / 180) * beta)) / Math.sin((Math.PI / 180) * gamma);
+
+			let v = c * Math.cos((Math.PI / 180) * wnk) + x3;
+			let w = c * Math.sin((Math.PI / 180) * wnk) + y3;
+
+			paintTree(x3,y3,v,w, lvl, c, wnk + alpha);
+			paintTree(v,w,x4,y4, lvl, b, wnk - beta);
+
 		}
 
-		paintTree(350, 500, 450, 500, level);
+		paintTree(350, 500, 450, 500, level, initLength, winkel* -1);
 		htmlLevel.value = level;
 		htmlLeVal.innerHTML = level;
 		htmlWinkel.value = winkel;
@@ -115,25 +119,79 @@
 				level = this.value;
 				htmlLeVal.innerHTML = level;	
 				context.clearRect(0, 0, canvas.width, canvas.height);
-				paintTree(350, 500, 450, 500, level);
+				paintTree(350, 500, 450, 500, level, initLength, winkel * -1);
 			});
 
 			htmlWinkel.addEventListener("change", function(){
-				winkel = this.value;
-				tanphi = Math.tan(winkel * Math.PI/180);
+				winkel = this.value * 1;
 				htmlWinVal.innerHTML = winkel;		
 				context.clearRect(0, 0, canvas.width, canvas.height);
-				paintTree(350, 500, 450, 500, level);
+				paintTree(350, 500, 450, 500, level, initLength, winkel * -1);
 			});
 
 			htmlRWinkel.addEventListener("click", function(){
-				rWinkel = 1;
-				context.clearRect(0, 0, canvas.width, canvas.height);
-				paintTree(350, 500, 450, 500, level);
-				rWinkel = 0;
+				//rWinkel = 1;
+				//context.clearRect(0, 0, canvas.width, canvas.height);
+				//paintTree(350, 500, 450, 500, level, initLength);
+				//rWinkel = 0;
 			});
 		});
-
+		function getWinkelFromLevel(lvl) {
+			var offset = 11 - level;
+			lvl = lvl + offset;
+			switch (lvl) {
+				case 0:
+					return -330;
+				case 1:
+					return -300
+				case 2:
+					return -270;
+				case 3:
+					return -240;
+				case 4:
+					return -210;
+				case 5:
+					return -180;	
+				case 6:
+					return -150;
+				case 7:
+					return -120;
+				case 8:
+					return -90;
+				case 9:
+					return -60;	
+				case 10:
+					return -30;
+			}
+		}
+		function getWinkelFromLevel2(lvl) {
+			var offset = 11 - level;
+			lvl = lvl + offset;
+			switch (lvl) {
+				case 0:
+					return 330;
+				case 1:
+					return 300
+				case 2:
+					return 270;
+				case 3:
+					return 240;
+				case 4:
+					return 210;
+				case 5:
+					return 180;	
+				case 6:
+					return 150;
+				case 7:
+					return 120;
+				case 8:
+					return 90;
+				case 9:
+					return 60;	
+				case 10:
+					return 30;
+			}
+		}
 		function getColorFromLevel(lvl)
 		{
 			var offset = 11 - level;
