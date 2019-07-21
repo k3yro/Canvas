@@ -63,13 +63,13 @@
 		let htmlRWinkel = document.querySelector("#rWinkel");
 
 		// Configure
-		let winkel = 45;
+		let winkel = 30;
 		//let rWinkel = 0;
-		let level = 8;
+		let level = 11;
 		let colorSet = 0;
 		let initLength = 100;
 
-		function paintTree(x1, y1, x2, y2, lvl, c, wnk)
+		function paintTree(x1, y1, x2, y2, lvl, c, wnk, cWink)
 		{
 			if (lvl <= 0) return; lvl--;
 			//if (rWinkel) tanphi = Math.tan(Math.round(Math.random() * 25 + 25) * Math.PI/180);
@@ -92,22 +92,57 @@
 			context.closePath();
 			context.fill();
 
-			let alpha = winkel * -1;
-			let gamma = -90;
-			let beta = (180 + alpha + gamma)*-1;
+			let rechtwinklig = true;
+			let winkelVertauscht = false;
 
-			let b = (c * Math.sin((Math.PI / 180) * alpha)) / Math.sin((Math.PI / 180) * gamma);
-			c = (c * Math.sin((Math.PI / 180) * beta)) / Math.sin((Math.PI / 180) * gamma);
+			if (rechtwinklig) {
+				if (winkelVertauscht) {
+					cWink = 90 - cWink;
 
-			let v = c * Math.cos((Math.PI / 180) * wnk) + x3;
-			let w = c * Math.sin((Math.PI / 180) * wnk) + y3;
+					let alpha = cWink * -1;
+					let gamma = -90;
+					let beta = (180 + alpha + gamma) * -1;
 
-			paintTree(x3,y3,v,w, lvl, c, wnk + alpha);
-			paintTree(v,w,x4,y4, lvl, b, wnk - beta);
+					// Sinussatz
+					let a = (c * Math.sin((Math.PI / 180) * alpha)) / Math.sin((Math.PI / 180) * gamma);
+					let b = (c * Math.sin((Math.PI / 180) * beta)) / Math.sin((Math.PI / 180) * gamma);
+
+					let v = a * Math.cos((Math.PI / 180) * wnk) + x3;
+					let w = a * Math.sin((Math.PI / 180) * wnk) + y3;
+
+					paintTree(x3,y3,v,w, lvl, a, wnk + alpha, cWink);
+					paintTree(v,w,x4,y4, lvl, b, wnk - beta, cWink);
+				}else{
+					let alpha = cWink * -1;
+					let gamma = -90;
+					let beta = (180 + alpha + gamma)*-1;
+
+					// Sinussatz
+					let a = (c * Math.sin((Math.PI / 180) * alpha)) / Math.sin((Math.PI / 180) * gamma);
+					let b = (c * Math.sin((Math.PI / 180) * beta)) / Math.sin((Math.PI / 180) * gamma);
+
+					let v = b * Math.cos((Math.PI / 180) * wnk) + x3;
+					let w = b * Math.sin((Math.PI / 180) * wnk) + y3;
+
+					paintTree(x3,y3,v,w, lvl, b, wnk + alpha, cWink);
+					paintTree(v,w,x4,y4, lvl, a, wnk - beta, cWink);
+				}
+				
+			}else{
+				let v = ((x3 + x4) / 2 - (dy/2 *  Math.tan((Math.PI / 180) * winkel)));
+				let w = ((y3 + y4) / 2 - (dx/2 *  Math.tan((Math.PI / 180) * winkel)));
+
+				if((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) > 2) {
+					paintTree(x3,y3,v,w, lvl, null, null, null);
+					paintTree(v,w,x4,y4, lvl, null, null, null);
+				}
+			}
 
 		}
 
-		paintTree(350, 500, 450, 500, level, initLength, winkel* -1);
+
+
+		paintTree(350, 500, 450, 500, level, initLength, winkel* -1, winkel);
 		htmlLevel.value = level;
 		htmlLeVal.innerHTML = level;
 		htmlWinkel.value = winkel;
@@ -119,14 +154,14 @@
 				level = this.value;
 				htmlLeVal.innerHTML = level;	
 				context.clearRect(0, 0, canvas.width, canvas.height);
-				paintTree(350, 500, 450, 500, level, initLength, winkel * -1);
+				paintTree(350, 500, 450, 500, level, initLength, winkel * -1, winkel);
 			});
 
 			htmlWinkel.addEventListener("change", function(){
 				winkel = this.value * 1;
 				htmlWinVal.innerHTML = winkel;		
 				context.clearRect(0, 0, canvas.width, canvas.height);
-				paintTree(350, 500, 450, 500, level, initLength, winkel * -1);
+				paintTree(350, 500, 450, 500, level, initLength, winkel * -1, winkel);
 			});
 
 			htmlRWinkel.addEventListener("click", function(){
