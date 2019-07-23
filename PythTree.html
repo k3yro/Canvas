@@ -37,42 +37,53 @@
 		<label for="winkel">Winkel</label><br>
 		<input type="range" id="winkel" value="30" min="0" max="90" />
 		<span id="winkel_value"></span>
-		<br /><br />
-		<input type="button" id="rWinkel" value="Zufällige Winkel" />
+		<br />
+		<br />
+		<fieldset>
+			<legend>Architektur</legend>		
+			<input type="radio" name="alphaBetaGamma" id="rechtwinklig" value="rechtwinklig" checked="checked" />
+			<label for="rechtwinklig"> Rechtwinklig</label>
+			<br />
+			<input type="radio" name="alphaBetaGamma" id="reverse" value="reverse" />
+			<label for="reverse"> Vertauscht</label>
+			<br />
+			<input type="radio" name="alphaBetaGamma" id="symmetrisch" value="symmetrisch" />
+			<label for="symmetrisch"> Symmetrisch</label> 
+		</fieldset>
 	</div>
-	<div id="log">
-		<table>
-			<tr>
-				<td></td>
-				<td id="test"></td>
-			</tr>
-		</table>
-	</div>
+
 	<script>
 
 		const canvas = document.getElementById('canvas2d');
 		const context = canvas.getContext('2d');
-	
-		let circlePosX = canvas.width / 2;
-		let circlePosY = canvas.height / 2;
 
+		// Form elements
 		let htmlLevel = document.querySelector("#level");
 		let htmlLeVal = document.querySelector("#level_value");
 		let htmlWinkel = document.querySelector("#winkel");
 		let htmlWinVal = document.querySelector("#winkel_value");
-		let htmlRWinkel = document.querySelector("#rWinkel");
+		let htmlRechtwinklig = document.querySelector("#rechtwinklig");
+		let htmlReverse = document.querySelector("#reverse");
+		let htmlSymmetrisch = document.querySelector("#symmetrisch");
 
 		// Configure
 		let winkel = 30;
-		//let rWinkel = 0;
 		let level = 11;
-		let colorSet = 0;
-		let initLength = 100;
+		let colorSet = 0; // 0:1
+		let rechtwinklig = htmlRechtwinklig.checked || htmlReverse.checked ? true : false;
+		let winkelVertauscht = htmlReverse.checked ? true : false;
+		let initWidth = 80;
+		let initHeight = 100;
+
+		// Init Coords
+		let initX1 = canvas.width / 2 - initWidth / 2;
+		let initY1 = canvas.height - 10;
+		let initX2 = canvas.width / 2 + initWidth / 2;
+		let initY2 = initY1;
 
 		function paintTree(x1, y1, x2, y2, lvl, c, wnk, cWink)
 		{
 			if (lvl <= 0) return; lvl--;
-			//if (rWinkel) tanphi = Math.tan(Math.round(Math.random() * 25 + 25) * Math.PI/180);
 			
 			let dx = x2 - x1;
 			let dy = y1 - y2;
@@ -91,9 +102,6 @@
 			context.lineTo(x3, y3);
 			context.closePath();
 			context.fill();
-
-			let rechtwinklig = true;
-			let winkelVertauscht = false;
 
 			if (rechtwinklig) {
 				if (winkelVertauscht) {
@@ -140,9 +148,7 @@
 
 		}
 
-
-
-		paintTree(350, 500, 450, 500, level, initLength, winkel* -1, winkel);
+		paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel* -1, winkel);
 		htmlLevel.value = level;
 		htmlLeVal.innerHTML = level;
 		htmlWinkel.value = winkel;
@@ -154,79 +160,43 @@
 				level = this.value;
 				htmlLeVal.innerHTML = level;	
 				context.clearRect(0, 0, canvas.width, canvas.height);
-				paintTree(350, 500, 450, 500, level, initLength, winkel * -1, winkel);
+				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
 			});
 
 			htmlWinkel.addEventListener("change", function(){
 				winkel = this.value * 1;
 				htmlWinVal.innerHTML = winkel;		
 				context.clearRect(0, 0, canvas.width, canvas.height);
-				paintTree(350, 500, 450, 500, level, initLength, winkel * -1, winkel);
+				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
 			});
 
-			htmlRWinkel.addEventListener("click", function(){
-				//rWinkel = 1;
-				//context.clearRect(0, 0, canvas.width, canvas.height);
-				//paintTree(350, 500, 450, 500, level, initLength);
-				//rWinkel = 0;
+			htmlRechtwinklig.addEventListener("click", function(){
+				rechtwinklig = true;
+				winkelVertauscht = false;
+				htmlWinkel.max = 90;
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
+			});
+
+			htmlReverse.addEventListener("click", function(){
+				rechtwinklig = true;
+				winkelVertauscht = true;
+				htmlWinkel.max = 90;
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
+			});
+
+			htmlSymmetrisch.addEventListener("click", function(){
+				rechtwinklig = false;
+				htmlWinkel.max = 60;
+				winkel = winkel > 60 ? 60: winkel;
+				htmlWinkel.value = winkel > 60 ? 60: winkel;
+				htmlWinVal.innerHTML = winkel > 60 ? 60: winkel;
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
 			});
 		});
-		function getWinkelFromLevel(lvl) {
-			var offset = 11 - level;
-			lvl = lvl + offset;
-			switch (lvl) {
-				case 0:
-					return -330;
-				case 1:
-					return -300
-				case 2:
-					return -270;
-				case 3:
-					return -240;
-				case 4:
-					return -210;
-				case 5:
-					return -180;	
-				case 6:
-					return -150;
-				case 7:
-					return -120;
-				case 8:
-					return -90;
-				case 9:
-					return -60;	
-				case 10:
-					return -30;
-			}
-		}
-		function getWinkelFromLevel2(lvl) {
-			var offset = 11 - level;
-			lvl = lvl + offset;
-			switch (lvl) {
-				case 0:
-					return 330;
-				case 1:
-					return 300
-				case 2:
-					return 270;
-				case 3:
-					return 240;
-				case 4:
-					return 210;
-				case 5:
-					return 180;	
-				case 6:
-					return 150;
-				case 7:
-					return 120;
-				case 8:
-					return 90;
-				case 9:
-					return 60;	
-				case 10:
-					return 30;
-			}
-		}
+
 		function getColorFromLevel(lvl)
 		{
 			var offset = 11 - level;
