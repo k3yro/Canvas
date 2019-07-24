@@ -31,7 +31,7 @@
 		<h2>Einstellungen</h2>
 
 		<label for="level">Recursionslevel</label><br>
-		<input type="range" id="level" value="1" min="1" max="11" />
+		<input type="range" id="level" value="1" min="1" max="14" />
 		<span id="level_value"></span>
 
 		<label for="winkel">Winkel</label><br>
@@ -39,6 +39,7 @@
 		<span id="winkel_value"></span>
 		<br />
 		<br />
+		
 		<fieldset>
 			<legend>Architektur</legend>		
 			<input type="radio" name="alphaBetaGamma" id="rechtwinklig" value="rechtwinklig" checked="checked" />
@@ -50,6 +51,14 @@
 			<input type="radio" name="alphaBetaGamma" id="symmetrisch" value="symmetrisch" />
 			<label for="symmetrisch"> Symmetrisch</label> 
 		</fieldset>
+
+		<label for="breite">Breite</label><br>
+		<input type="range" id="breite" value="60" min="1" max="130" />
+		<span id="breite_value"></span>
+
+		<label for="hoehe">Höhe</label><br>
+		<input type="range" id="hoehe" value="60" min="1" max="130" />
+		<span id="hoehe_value"></span>
 	</div>
 
 	<script>
@@ -65,32 +74,39 @@
 		let htmlRechtwinklig = document.querySelector("#rechtwinklig");
 		let htmlReverse = document.querySelector("#reverse");
 		let htmlSymmetrisch = document.querySelector("#symmetrisch");
+		let htmlBreite = document.querySelector("#breite");
+		let htmlBreiVal = document.querySelector("#breite_value");
+		let htmlHoehe = document.querySelector("#hoehe");
+		let htmlHoeVal = document.querySelector("#hoehe_value");
 
 		// Configure
-		let winkel = 30;
+		let winkel = 37;
 		let level = 11;
-		let colorSet = 0; // 0:1
+		let colorSet = 0; // 0:1		
+		let initWidth = 60;
+		let initHeight = 60;
+
+		// Architecture
 		let rechtwinklig = htmlRechtwinklig.checked || htmlReverse.checked ? true : false;
 		let winkelVertauscht = htmlReverse.checked ? true : false;
-		let initWidth = 80;
-		let initHeight = 100;
 
 		// Init Coords
 		let initX1 = canvas.width / 2 - initWidth / 2;
 		let initY1 = canvas.height - 10;
 		let initX2 = canvas.width / 2 + initWidth / 2;
 		let initY2 = initY1;
+		let hwRatio = initHeight / initWidth;
 
 		function paintTree(x1, y1, x2, y2, lvl, c, wnk, cWink)
 		{
 			if (lvl <= 0) return; lvl--;
-			
+
 			let dx = x2 - x1;
 			let dy = y1 - y2;
-			let x3 = x1 - dy;
-			let y3 = y1 - dx;
-			let x4 = x2 - dy;
-			let y4 = y2 - dx;
+			let x3 = x1 - dy * hwRatio;
+			let y3 = y1 - dx * hwRatio;
+			let x4 = x2 - dy * hwRatio;
+			let y4 = y2 - dx * hwRatio;
 
 			context.fillStyle = getColorFromLevel(lvl);
 			context.beginPath();
@@ -153,6 +169,17 @@
 		htmlLeVal.innerHTML = level;
 		htmlWinkel.value = winkel;
 		htmlWinVal.innerHTML = winkel;
+		htmlBreite.value = initWidth;
+		htmlBreiVal.innerHTML = initWidth;
+		htmlHoehe.value = initHeight;
+		htmlHoeVal.innerHTML = initHeight;
+
+		if (!rechtwinklig) {
+			htmlWinkel.max = 60;
+			winkel = winkel > 60 ? 60: winkel;
+			htmlWinkel.value = winkel > 60 ? 60: winkel;
+			htmlWinVal.innerHTML = winkel > 60 ? 60: winkel;
+		}
 
 		window.addEventListener("load", function(){
 
@@ -195,6 +222,26 @@
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
 			});
+
+			htmlBreite.addEventListener("click", function(){
+				initWidth = this.value * 1;
+				htmlBreiVal.innerHTML = initWidth;
+				initX1 = canvas.width / 2 - initWidth / 2;
+				initY1 = canvas.height - 10;
+				initX2 = canvas.width / 2 + initWidth / 2;
+				initY2 = initY1;
+				hwRatio = initHeight / initWidth;
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
+			});
+
+			htmlHoehe.addEventListener("click", function(){
+				initHeight = this.value * 1;
+				htmlHoeVal.innerHTML = initHeight;
+				hwRatio = initHeight / initWidth;
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
+			});
 		});
 
 		function getColorFromLevel(lvl)
@@ -203,6 +250,7 @@
 			lvl = lvl + offset;
 			switch (lvl) {
 				case 0:
+				default:
 					return colorSet ? "#3b9d66" : "#0000ff";
 				case 1:
 					return colorSet ? "#4ea766" : "#002bff";
@@ -223,9 +271,7 @@
 				case 9:
 					return colorSet ? "#ebf566" : "#ffb000";	
 				case 10:
-					return colorSet ? "#ffff66" : "#ff0000";		
-				default:
-					return "black";
+					return colorSet ? "#ffff66" : "#ff0000";
 			}	
 		}
 
