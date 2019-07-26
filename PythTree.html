@@ -59,6 +59,10 @@
 		<label for="hoehe">Höhe</label><br>
 		<input type="range" id="hoehe" value="60" min="1" max="130" />
 		<span id="hoehe_value"></span>
+
+		<label>Farben</label>
+		<input type="radio" name="farbeBaum" id="farbeBunt" value="farbeBunt" checked="checked" />
+		<input type="radio" name="farbeBaum" id="farbeNatur" value="farbeNatur" />
 	</div>
 
 	<script>
@@ -78,13 +82,15 @@
 		let htmlBreiVal = document.querySelector("#breite_value");
 		let htmlHoehe = document.querySelector("#hoehe");
 		let htmlHoeVal = document.querySelector("#hoehe_value");
+		let htmlFarbeBunt = document.querySelector("#farbeBunt");
+		let htmlFarbeNatur = document.querySelector("#farbeNatur");
 
 		// Configure
-		let winkel = 37;
+		let winkel = 45;
 		let level = 11;
-		let colorSet = 0; // 0:1		
-		let initWidth = 60;
-		let initHeight = 60;
+		let colorSet = htmlFarbeBunt.checked ? 0 : 1;
+		let initWidth = 100;
+		let initHeight = 100;
 
 		// Architecture
 		let rechtwinklig = htmlRechtwinklig.checked || htmlReverse.checked ? true : false;
@@ -242,6 +248,18 @@
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
 			});
+
+			htmlFarbeBunt.addEventListener("click", function(){
+				colorSet = 0;
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
+			});
+
+			htmlFarbeNatur.addEventListener("click", function(){
+				colorSet = 1;
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
+			});
 		});
 
 		function getColorFromLevel(lvl)
@@ -251,27 +269,27 @@
 			switch (lvl) {
 				case 0:
 				default:
-					return colorSet ? "#3b9d66" : "#0000ff";
+					return colorSet ? "#00b33c" : "#0000ff";
 				case 1:
-					return colorSet ? "#4ea766" : "#002bff";
+					return colorSet ? "#00802b" : "#002bff";
 				case 2:
-					return colorSet ? "#62b166" : "#005aff";
+					return colorSet ? "#663300" : "#005aff";
 				case 3:
-					return colorSet ? "#76ba66" : "#008fff";
+					return colorSet ? "#804000" : "#008fff";
 				case 4:
-					return colorSet ? "#89c466" : "#00bbff";
+					return colorSet ? "#663300" : "#00bbff";
 				case 5:
-					return colorSet ? "#9dce66" : "#00ebff";	
+					return colorSet ? "#804000" : "#00ebff";	
 				case 6:
-					return colorSet ? "#b1d866" : "#00ffa3";
+					return colorSet ? "#663300" : "#00ffa3";
 				case 7:
-					return colorSet ? "#c4e266" : "#05ff00";
+					return colorSet ? "#804000" : "#05ff00";
 				case 8:
-					return colorSet ? "#d8eb66" : "#ddff00";
+					return colorSet ? "#663300" : "#ddff00";
 				case 9:
-					return colorSet ? "#ebf566" : "#ffb000";	
+					return colorSet ? "#804000" : "#ffb000";	
 				case 10:
-					return colorSet ? "#ffff66" : "#ff0000";
+					return colorSet ? "#663300" : "#ff0000";
 			}	
 		}
 
