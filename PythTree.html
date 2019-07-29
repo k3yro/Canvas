@@ -9,6 +9,9 @@
 		*{
 			font-family: monospace;
 		}
+		h2{
+			margin-bottom: 30px;
+		}
 		#canvas2d{
 			float:left;
 			width: 800px;
@@ -21,6 +24,13 @@
 		#log{
 			clear: both;
 		}
+		#winkelRandom{
+			display: none;
+			margin-bottom: 20px;		
+		}
+		.leading{
+			margin-bottom: 10px;
+		}
 
 	</style>
 </head>
@@ -31,16 +41,16 @@
 		<h2>Einstellungen</h2>
 
 		<label for="level">Recursionslevel</label><br>
-		<input type="range" id="level" value="1" min="1" max="14" />
+		<input type="range" id="level" class="leading" value="1" min="1" max="14" />
 		<span id="level_value"></span>
 
 		<label for="winkel">Winkel</label><br>
-		<input type="range" id="winkel" value="30" min="0" max="90" />
+		<input type="range" id="winkel" class="leading" value="30" min="0" max="90" />
 		<span id="winkel_value"></span>
-		<br />
-		<br />
-		
-		<fieldset>
+
+		<input type="button" id="winkelRandom" class="leading" name="winkelRandom" value="Zufällige Winkel" />
+
+		<fieldset class="leading">
 			<legend>Architektur</legend>		
 			<input type="radio" name="alphaBetaGamma" id="rechtwinklig" value="rechtwinklig" checked="checked" />
 			<label for="rechtwinklig"> Rechtwinklig</label>
@@ -53,16 +63,16 @@
 		</fieldset>
 
 		<label for="breite">Breite</label><br>
-		<input type="range" id="breite" value="60" min="1" max="130" />
+		<input type="range" id="breite" class="leading" value="60" min="1" max="130" />
 		<span id="breite_value"></span>
 
 		<label for="hoehe">Höhe</label><br>
-		<input type="range" id="hoehe" value="60" min="1" max="130" />
+		<input type="range" id="hoehe" class="leading" value="60" min="1" max="130" />
 		<span id="hoehe_value"></span>
 
 		<label>Farben</label>
-		<input type="radio" name="farbeBaum" id="farbeBunt" value="farbeBunt" checked="checked" />
-		<input type="radio" name="farbeBaum" id="farbeNatur" value="farbeNatur" />
+		<input type="radio" name="farbeBaum" id="farbeBunt" class="leading" value="farbeBunt" checked="checked" />
+		<input type="radio" name="farbeBaum" id="farbeNatur" class="leading" value="farbeNatur" />
 	</div>
 
 	<script>
@@ -84,6 +94,7 @@
 		let htmlHoeVal = document.querySelector("#hoehe_value");
 		let htmlFarbeBunt = document.querySelector("#farbeBunt");
 		let htmlFarbeNatur = document.querySelector("#farbeNatur");
+		let htmlWinkelRandom = document.querySelector("#winkelRandom");
 
 		// Configure
 		let winkel = 45;
@@ -91,6 +102,7 @@
 		let colorSet = htmlFarbeBunt.checked ? 0 : 1;
 		let initWidth = 100;
 		let initHeight = 100;
+		let winkelRandom = 0;
 
 		// Architecture
 		let rechtwinklig = htmlRechtwinklig.checked || htmlReverse.checked ? true : false;
@@ -159,8 +171,11 @@
 				}
 				
 			}else{
-				let v = ((x3 + x4) / 2 - (dy/2 *  Math.tan((Math.PI / 180) * winkel)));
-				let w = ((y3 + y4) / 2 - (dx/2 *  Math.tan((Math.PI / 180) * winkel)));
+
+				let gammaTan = winkelRandom ? Math.tan(Math.round(Math.random() * 25 + 25) * Math.PI/180) : Math.tan((Math.PI / 180 * winkel));
+
+				let v = ((x3 + x4) / 2 - (dy/2 *  gammaTan));
+				let w = ((y3 + y4) / 2 - (dx/2 * gammaTan));
 
 				if((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) > 2) {
 					paintTree(x3,y3,v,w, lvl, null, null, null);
@@ -185,6 +200,7 @@
 			winkel = winkel > 60 ? 60: winkel;
 			htmlWinkel.value = winkel > 60 ? 60: winkel;
 			htmlWinVal.innerHTML = winkel > 60 ? 60: winkel;
+			htmlWinkelRandom.style.display = "block";
 		}
 
 		window.addEventListener("load", function(){
@@ -207,6 +223,7 @@
 				rechtwinklig = true;
 				winkelVertauscht = false;
 				htmlWinkel.max = 90;
+				htmlWinkelRandom.style.display = "none";
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
 			});
@@ -215,6 +232,7 @@
 				rechtwinklig = true;
 				winkelVertauscht = true;
 				htmlWinkel.max = 90;
+				htmlWinkelRandom.style.display = "none";
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
 			});
@@ -225,6 +243,7 @@
 				winkel = winkel > 60 ? 60: winkel;
 				htmlWinkel.value = winkel > 60 ? 60: winkel;
 				htmlWinVal.innerHTML = winkel > 60 ? 60: winkel;
+				htmlWinkelRandom.style.display = "block";
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
 			});
@@ -259,6 +278,13 @@
 				colorSet = 1;
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
+			});
+
+			htmlWinkelRandom.addEventListener("click", function(){
+				winkelRandom = 1;
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				paintTree(initX1, initY1, initX2, initY2, level, initWidth, winkel * -1, winkel);
+				winkelRandom = 0;
 			});
 		});
 
