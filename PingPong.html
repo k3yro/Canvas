@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Titel</title>
+	<script type="text/javascript">
+	
+		// X-Position Schläger
+		let racketPos = 800 / 2 - 50;	
+		
+		// Tastatur einlesen
+		document.addEventListener('keydown', function(event) {
+			switch(event.keyCode){
+				case 65/*a*/:
+				case 37:
+					racketPos -= 10;
+				break;
+				case 68/*d*/:
+				case 39:
+					racketPos += 10;
+				break;
+			}			
+		}, false);
+		
+		function Game()
+		{
+			let spielfeld = document.getElementById('spielfeld');
+			let ctx = spielfeld.getContext('2d');
+			let ballX = 800 / 2;
+			let ballY = 600 / 2;
+			let ballBeschleunigungY = 2;
+			let ballBeschleunigungX = 0;
+			
+			// Debugging
+			let d_ballx = document.getElementById('ballx');
+			let d_bally = document.getElementById('bally');
+			
+			// Game Loop
+			setInterval (function(){	
+				
+				// Game Over
+				if(ballY >= 600 + 10)
+				{
+					alert("you loose");
+					ballY = 600 / 2;
+					ballX = 800 / 2;
+					ballBeschleunigungX = 0;
+					racketPos = 800 / 2 - 50;					
+				}
+
+				// Obere Kollision
+				if(ballY <= 0 + 10)
+				{				
+					ballBeschleunigungY *= -1;
+				}
+				
+				// Rechte Kollision
+				if(ballX >= 800 - 10)
+				{
+					ballBeschleunigungX *= -1;
+				}
+				
+				// Linke Kollision
+				if(ballX <= 0 + 10)
+				{
+					ballBeschleunigungX *= -1;
+				}
+				
+				// Schläger Kollision
+				if(ballY + 10 >= 570 && ballY - 10 <= 590)
+				{
+					if(ballX >= racketPos && ballX <= (racketPos + 100))
+					{
+						if(ballBeschleunigungY > 0)
+						{						
+							ballBeschleunigungY *= -1;
+
+							let winkel = 0;
+							
+							if(ballX <= (racketPos + 50))
+							{
+								winkel = (Math.random() * 2) * -1;
+							}else
+							{
+								winkel = Math.random() * 2;
+							}
+							ballBeschleunigungX = winkel;
+						}												
+					}
+				}
+				
+				// Spielfeld löschen
+				ctx.clearRect(0, 0, spielfeld.width, spielfeld.height);
+				
+				// Rechteck
+				ctx.fillRect(racketPos, 570, 100, 20);
+				
+				// Debug
+				d_ballx.innerHTML = ballX;
+				d_bally.innerHTML = ballY;
+				
+				// Ball
+				ctx.beginPath();
+				ctx.arc(ballX += ballBeschleunigungX, ballY += ballBeschleunigungY, 10, 0, 1.8 * Math.PI);
+				ctx.fill();
+				
+			}, 10);
+		}
+	</script>
+  </head>
+  <body onload="Game()">
+	<canvas id="spielfeld" width="800" height="600" style="border:1px solid"></canvas>
+	<table>
+		<tr>
+			<td>ballX:</td>
+			<td id="ballx"></td>
+		</tr>
+		<tr>
+			<td>ballY:</td>
+			<td id="bally"></td>
+		</tr>	
+	</table>
+  </body>
+</html>
